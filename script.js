@@ -100,28 +100,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Touch Support (Swipe)
   let touchStartX = 0;
+  let touchStartY = 0;
   let touchEndX = 0;
+  let touchEndY = 0;
 
   document.addEventListener(
     "touchstart",
     (e) => {
       touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
     },
-    { passive: true }
+    { passive: true } // Passive helps with scrolling performance
   );
 
   document.addEventListener(
     "touchend",
     (e) => {
       touchEndX = e.changedTouches[0].screenX;
+      touchEndY = e.changedTouches[0].screenY;
       handleSwipe();
     },
     { passive: true }
   );
 
   function handleSwipe() {
-    const threshold = 50; // min distance
-    if (touchEndX < touchStartX - threshold) nextSlide();
-    if (touchEndX > touchStartX + threshold) prevSlide();
+    const minSwipeDistance = 50; // min distance to be considered a swipe
+    const xDistance = touchEndX - touchStartX;
+    const yDistance = touchEndY - touchStartY;
+
+    // Check if horizontal movement is greater than vertical movement
+    if (Math.abs(xDistance) > Math.abs(yDistance)) {
+      // It is a horizontal swipe
+      if (Math.abs(xDistance) > minSwipeDistance) {
+        if (xDistance < 0) {
+          nextSlide(); // Swipe Left -> Next
+        } else {
+          prevSlide(); // Swipe Right -> Prev
+        }
+      }
+    }
+    // Else: it is likely a scroll, do nothing (let browser handle scrolling)
   }
 });
